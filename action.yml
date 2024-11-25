@@ -1,5 +1,5 @@
-name: "AI Code Review Action"
-description: "Perform code reviews and comment on diffs using OpenAI API."
+name: "AI Code Reviewer"
+description: "Perform code reviews and comment on diffs with your own rules using OpenAI API."
 inputs:
   GITHUB_TOKEN:
     description: "GitHub token to interact with the repository."
@@ -11,9 +11,9 @@ inputs:
     description: "OpenAI API model."
     required: false
     default: "gpt-4"
-  exclude:
-    description: "Glob patterns to exclude files from the diff analysis"
-    required: false
+  rules_file_name:
+    description: "YAML file with Glob patterns to set specific rules (prompts) for file extensions, directories, global rules, or exclude files from the diff analysis"
+    required: true
     default: ""
 runs:
   using: "node16"

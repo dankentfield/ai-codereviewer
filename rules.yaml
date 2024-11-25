@@ -1,0 +1,23 @@
+# Global rules that apply to all files/directories unless overridden
+global: []  
+
+# Rules for specific file extensions
+extensions:
+  [".ts", ".js"]: ["Always use export default"]
+  "tsx": ["Always use arrow functions"]
+
+# Rules for specific directories
+directories: 
+  "src/**": []
+
+# Paths to ignore completely
+ignore:
+  - ".git"
+  - "node_modules"
+  - "dist"
+  - "build" 
+  - "_build" 
+  - "csv" 
+  - "json" 
+
+  

@@ -43,19 +43,49 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # The GITHUB_TOKEN is there by default so you just need to keep it like it is and not necessarily need to add it as secret as it will throw an error. [More Details](https://docs.github.com/en/actions/security-guides/automatic-token-authentication#about-the-github_token-secret)
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_API_MODEL: "gpt-4" # Optional: defaults to "gpt-4"
-          exclude: "**/*.json, **/*.md" # Optional: exclude patterns separated by commas
+          rules_file_name: "rules.yaml" # Required
 ```
 
-4. Replace `your-username` with your GitHub username or organization name where the AI Code Reviewer repository is
+4. Create a `.github/workflows/rules.yaml` file in your repository and customise the rules you would like:
+
+```yaml
+# .github/workflows/rules.yaml
+
+# Global rules that apply to all files/directories unless overridden
+global: [ 
+  "Always be concise", 
+  "Always consider security vulnerabilities"
+]  
+
+# Rules for specific file extensions - keys are glob patterns
+extensions:
+  [".ts", ".js"]: ["Always use export default"]
+  "tsx": ["Always use arrow functions"]
+
+# Rules for specific directories - keys are glob patterns
+directories: 
+  "**/resolvers/**": ["Always use mocks in tests"]
+  "src/**": ["Always write tests"]
+
+# Paths to ignore completely
+ignore:
+  - ".git"
+  - "node_modules"
+  - "dist"
+  - "build" 
+  - "_build" 
+  - "csv" 
+  - "json" 
+```
+
+5. Replace `your-username` with your GitHub username or organization name where the AI Code Reviewer repository is
    located.
 
-5. Customize the `exclude` input if you want to ignore certain file patterns from being reviewed.
-
-6. Commit the changes to your repository, and AI Code Reviewer will start working on your future pull requests.
+7. Commit the changes to your repository, and AI Code Reviewer will start working on your future pull requests.
 
 ## How It Works
 
-The AI Code Reviewer GitHub Action retrieves the pull request diff, filters out excluded files, and sends code chunks to
+The AI Code Reviewer GitHub Action retrieves the pull request diff, filters out excluded files, filters the coding style rules from rules.yaml to only include those relevant to the file, and sends code chunks to
 the OpenAI API. It then generates review comments based on the AI's response and adds them to the pull request.
 
 ## Contributing

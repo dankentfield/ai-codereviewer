@@ -4,6 +4,7 @@ import OpenAI from "openai";
 import { Octokit } from "@octokit/rest";
 import parseDiff, { Chunk, File } from "parse-diff";
 import minimatch from "minimatch";
+import { parse, stringify } from 'yaml'
 
 const GITHUB_TOKEN: string = core.getInput("GITHUB_TOKEN");
 const OPENAI_API_KEY: string = core.getInput("OPENAI_API_KEY");
@@ -58,14 +59,15 @@ async function getDiff(
 
 async function analyzeCode(
   parsedDiff: File[],
-  prDetails: PRDetails
+  prDetails: PRDetails,
+  rules: RulesFile
 ): Promise<Array<{ body: string; path: string; line: number }>> {
   const comments: Array<{ body: string; path: string; line: number }> = [];
 
   for (const file of parsedDiff) {
     if (file.to === "/dev/null") continue; // Ignore deleted files
     for (const chunk of file.chunks) {
-      const prompt = createPrompt(file, chunk, prDetails);
+      const prompt = createPrompt(file, chunk, prDetails, rules);
       const aiResponse = await getAIResponse(prompt);
       if (aiResponse) {
         const newComments = createComment(file, chunk, aiResponse);
@@ -78,7 +80,31 @@ async function analyzeCode(
   return comments;
 }
 
-function createPrompt(file: File, chunk: Chunk, prDetails: PRDetails): string {
+function getApplicableRules(rules: RulesFile, file: File): string[] {
+  const {extensions, directories, global} = rules;
+  
+  const extensionsKeys = Object.keys(extensions);
+  const applicableExtensionKeys = extensionsKeys.filter((key: string) => file.to?.endsWith(key));
+  const extensionRules = applicableExtensionKeys.flatMap((key: string) => extensions[key]);
+
+  const directoriesKeys = Object.keys(directories);
+  const applicableDirectoriesKeys = directoriesKeys.filter((key: string) => 
+    file.to ? minimatch(file.to, key) : false
+  );
+  const directoryRules = applicableDirectoriesKeys.flatMap((key: string) => directories[key]);
+
+  return [...global, ...extensionRules, ...directoryRules];
+}
+
+interface AIReviewLine {
+  lineNumber: string;
+  reviewComment: string;
+  path: string;
+}
+
+function createPrompt(file: File, chunk: Chunk, prDetails: PRDetails, rules: RulesFile): string {
+  const applicableRules = getApplicableRules(rules, file);
+
   return `Your task is to review pull requests. Instructions:
 - Provide the response in following JSON format:  {"reviews": [{"lineNumber":  <line_number>, "reviewComment": "<review comment>"}]}
 - Do not give positive comments or compliments.
@@ -87,9 +113,13 @@ function createPrompt(file: File, chunk: Chunk, prDetails: PRDetails): string {
 - Use the given description only for the overall context and only comment the code.
 - IMPORTANT: NEVER suggest adding comments to the code.
 
-Review the following code diff in the file "${
-    file.to
-  }" and take the pull request title and description into account when writing the response.
+Review the following code diff in the file "${file.to
+    }" and take the pull request title and description into account when writing the response.
+
+${applicableRules.length ?? 
+(`Always check the following rules to write the review:
+  ${applicableRules.join("\n")}
+`)}    
   
 Pull request title: ${prDetails.title}
 Pull request description:
@@ -103,17 +133,14 @@ Git diff to review:
 \`\`\`diff
 ${chunk.content}
 ${chunk.changes
-  // @ts-expect-error - ln and ln2 exists where needed
-  .map((c) => `${c.ln ? c.ln : c.ln2} ${c.content}`)
-  .join("\n")}
+      // @ts-expect-error - ln and ln2 exists where needed
+      .map((c) => `${c.ln ? c.ln : c.ln2} ${c.content}`)
+      .join("\n")}
 \`\`\`
 `;
 }
 
-async function getAIResponse(prompt: string): Promise<Array<{
-  lineNumber: string;
-  reviewComment: string;
-}> | null> {
+async function getAIResponse(prompt: string): Promise<Array<AIReviewLine> | null> {
   const queryConfig = {
     model: OPENAI_API_MODEL,
     temperature: 0.2,
@@ -126,10 +153,7 @@ async function getAIResponse(prompt: string): Promise<Array<{
   try {
     const response = await openai.chat.completions.create({
       ...queryConfig,
-      // return JSON if the model supports it:
-      ...(OPENAI_API_MODEL === "gpt-4-1106-preview"
-        ? { response_format: { type: "json_object" } }
-        : {}),
+      response_format: { type: "json_object" },
       messages: [
         {
           role: "system",
@@ -149,12 +173,9 @@ async function getAIResponse(prompt: string): Promise<Array<{
 function createComment(
   file: File,
   chunk: Chunk,
-  aiResponses: Array<{
-    lineNumber: string;
-    reviewComment: string;
-  }>
+  aiResponses: Array<AIReviewLine>
 ): Array<{ body: string; path: string; line: number }> {
-  return aiResponses.flatMap((aiResponse) => {
+  return aiResponses.flatMap((aiResponse: AIReviewLine) => {
     if (!file.to) {
       return [];
     }
@@ -221,18 +242,20 @@ async function main() {
 
   const parsedDiff = parseDiff(diff);
 
-  const excludePatterns = core
-    .getInput("exclude")
-    .split(",")
-    .map((s) => s.trim());
+  const rulesFiles = core
+    .getInput("rules_file_name")
+    .trim();
+
+  const rules = readRules(rulesFiles);
+  const {ignore: allIgnorePatterns = []} = rules;
 
   const filteredDiff = parsedDiff.filter((file) => {
-    return !excludePatterns.some((pattern) =>
+    return !allIgnorePatterns.some((pattern) =>
       minimatch(file.to ?? "", pattern)
     );
   });
 
-  const comments = await analyzeCode(filteredDiff, prDetails);
+  const comments = await analyzeCode(filteredDiff, prDetails, rules);
   if (comments.length > 0) {
     await createReviewComment(
       prDetails.owner,
@@ -243,7 +266,50 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  console.error("Error:", error);
-  process.exit(1);
-});
+interface RulesFile {
+  directories: Record<string, string[]>;
+  extensions: Record<string, string[]>;
+  global: Array<string>;
+  ignore: Array<string>;
+}
+
+function readRules(fileName: string): RulesFile {
+    const fileContents = readFileSync(fileName, "utf8");
+    const parsed = parse(fileContents, { mapAsMap: true });
+    
+    // Transform the parsed Map into a plain object
+    const rules: RulesFile = {
+        global: parsed.get('global') || [],
+        extensions: {},
+        directories: {},
+        ignore: parsed.get('ignore') || []
+    };
+
+    // Handle extensions map
+    const extensionsMap = parsed.get('extensions');
+    if (extensionsMap instanceof Map) {
+        for (const [key, value] of extensionsMap.entries()) {
+            // If key is an array, create an entry for each extension
+            if (Array.isArray(key)) {
+                key.forEach(ext => {
+                    rules.extensions[ext] = value;
+                });
+            } else {
+                rules.extensions[key] = value;
+            }
+        }
+    }
+
+    // Handle directories map
+    const directoriesMap = parsed.get('directories');
+    if (directoriesMap instanceof Map) {
+        for (const [key, value] of directoriesMap.entries()) {
+            rules.directories[key] = value;
+        }
+    }
+
+    return rules;
+}
+
+export { readRules, getApplicableRules };
+export default main;
