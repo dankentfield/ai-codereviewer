@@ -8,7 +8,7 @@ import { parse, stringify } from 'yaml'
 
 const GITHUB_TOKEN: string = core.getInput("GITHUB_TOKEN");
 const OPENAI_API_KEY: string = core.getInput("OPENAI_API_KEY");
-const OPENAI_API_MODEL: string = core.getInput("OPENAI_API_MODEL");
+const OPENAI_API_MODEL: string = core.getInput("OPENAI_API_MODEL") || "gpt-4o";
 
 const octokit = new Octokit({ auth: GITHUB_TOKEN });
 
@@ -243,7 +243,7 @@ async function main() {
   const parsedDiff = parseDiff(diff);
 
   const rulesFiles = core
-    .getInput("rules_file_name")
+    .getInput("config-file")
     .trim();
 
   const rules = readRules(rulesFiles);
@@ -273,8 +273,7 @@ interface RulesFile {
   ignore: Array<string>;
 }
 
-function readRules(fileName: string): RulesFile {
-    const fileContents = readFileSync(fileName, "utf8");
+function readRules(fileContents: string): RulesFile {
     const parsed = parse(fileContents, { mapAsMap: true });
     
     // Transform the parsed Map into a plain object

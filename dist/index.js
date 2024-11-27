@@ -52,7 +52,7 @@ const minimatch_1 = __importDefault(__nccwpck_require__(2002));
 const yaml_1 = __nccwpck_require__(4083);
 const GITHUB_TOKEN = core.getInput("GITHUB_TOKEN");
 const OPENAI_API_KEY = core.getInput("OPENAI_API_KEY");
-const OPENAI_API_MODEL = core.getInput("OPENAI_API_MODEL");
+const OPENAI_API_MODEL = core.getInput("OPENAI_API_MODEL") || "gpt-4o";
 const octokit = new rest_1.Octokit({ auth: GITHUB_TOKEN });
 const openai = new openai_1.default({
     apiKey: OPENAI_API_KEY,
@@ -236,7 +236,7 @@ function main() {
         }
         const parsedDiff = (0, parse_diff_1.default)(diff);
         const rulesFiles = core
-            .getInput("rules_file_name")
+            .getInput("config-file")
             .trim();
         const rules = readRules(rulesFiles);
         const { ignore: allIgnorePatterns = [] } = rules;
@@ -249,8 +249,7 @@ function main() {
         }
     });
 }
-function readRules(fileName) {
-    const fileContents = (0, fs_1.readFileSync)(fileName, "utf8");
+function readRules(fileContents) {
     const parsed = (0, yaml_1.parse)(fileContents, { mapAsMap: true });
     // Transform the parsed Map into a plain object
     const rules = {

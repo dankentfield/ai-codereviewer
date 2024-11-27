@@ -42,14 +42,14 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # The GITHUB_TOKEN is there by default so you just need to keep it like it is and not necessarily need to add it as secret as it will throw an error. [More Details](https://docs.github.com/en/actions/security-guides/automatic-token-authentication#about-the-github_token-secret)
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_API_MODEL: "gpt-4" # Optional: defaults to "gpt-4"
-          rules_file_name: "rules.yaml" # Required
+          OPENAI_API_MODEL: "gpt-4o" # Optional: defaults to "gpt-4o"
+          config-file: .github/config/rules.yaml # Required
 ```
 
-4. Create a `.github/workflows/rules.yaml` file in your repository and customise the rules you would like:
+4. Create a `.github/config/rules.yaml` file in your repository and customise the rules you would like:
 
 ```yaml
-# .github/workflows/rules.yaml
+# .github/config/rules.yaml
 
 # Global rules that apply to all files/directories unless overridden
 global: [ 
