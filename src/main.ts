@@ -203,6 +203,7 @@ async function createReviewComment(
 }
 
 async function main() {
+  console.log("Starting action")
   const prDetails = await getPRDetails();
   let diff: string | null;
   const eventData = JSON.parse(
@@ -246,6 +247,8 @@ async function main() {
     .getInput("config-file")
     .trim();
 
+  console.log("Rules file:", rulesFiles)
+
   const rules = readRules(rulesFiles);
   const {ignore: allIgnorePatterns = []} = rules;
 
@@ -275,6 +278,8 @@ interface RulesFile {
 
 function readRules(fileContents: string): RulesFile {
     const parsed = parse(fileContents, { mapAsMap: true });
+
+    console.log("Parsed rules:", parsed)
     
     // Transform the parsed Map into a plain object
     const rules: RulesFile = {
