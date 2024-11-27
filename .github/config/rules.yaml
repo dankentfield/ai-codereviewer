@@ -1,5 +1,5 @@
 # Global rules that apply to all files/directories unless overridden
-global: []  
+global: ["No console.logs allowed."]  
 
 # Rules for specific file extensions
 extensions:
