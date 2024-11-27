@@ -234,11 +234,12 @@ function main() {
             return;
         }
         const parsedDiff = (0, parse_diff_1.default)(diff);
-        const rulesFiles = core
+        const rulesFilePath = core
             .getInput("config-file")
             .trim();
-        console.log("Rules file:", rulesFiles);
-        const rules = readRules(rulesFiles);
+        const rulesFile = (0, fs_1.readFileSync)(rulesFilePath !== null && rulesFilePath !== void 0 ? rulesFilePath : "", "utf8");
+        console.log("Rules file:", rulesFile);
+        const rules = readRules(rulesFile);
         const { ignore: allIgnorePatterns = [] } = rules;
         const filteredDiff = parsedDiff.filter((file) => {
             return !allIgnorePatterns.some((pattern) => { var _a; return (0, minimatch_1.default)((_a = file.to) !== null && _a !== void 0 ? _a : "", pattern); });

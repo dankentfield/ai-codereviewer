@@ -243,13 +243,14 @@ async function main() {
 
   const parsedDiff = parseDiff(diff);
 
-  const rulesFiles = core
+  const rulesFilePath = core
     .getInput("config-file")
     .trim();
+    
+  const rulesFile = readFileSync(rulesFilePath ?? "", "utf8")
+  console.log("Rules file:", rulesFile)
 
-  console.log("Rules file:", rulesFiles)
-
-  const rules = readRules(rulesFiles);
+  const rules = readRules(rulesFile);
   const {ignore: allIgnorePatterns = []} = rules;
 
   const filteredDiff = parsedDiff.filter((file) => {
