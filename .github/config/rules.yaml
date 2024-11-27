@@ -1,16 +1,61 @@
-# Global rules that apply to all files/directories unless overridden
-global: ["No console.logs allowed."]  
+global: 
+  - "No console.logs allowed."
 
-# Rules for specific file extensions
 extensions:
-  [".ts", ".js"]: ["Always use export default"]
-  "tsx": ["Always use arrow functions"]
+  [".ts", ".js"]:
+    - "Always use export default"
+  "tsx": 
+    - "Always use arrow functions"
+  ["exs", "ex"]: 
+    - "If adding foreign keys, ensure appropriate indexes are added"
+    - "Verify index type is appropriate for the use case"
+    - "Consider if unique index is needed"
+    - "Ensure table names are pluralized"
+    - "For data migrations, include testing strategy"
+    - "New tables must use UUID as primary key"
+    - "Include timestamps (inserted_at, updated_at)"
+    - "Column removals must have all usages removed in previous PR"
 
-# Rules for specific directories
 directories: 
-  "src/**": []
+  "*Consumer.ex":
+    - "Update catalog-info.yaml"
+    - "Add schema to events schemas"
+  "*Publisher.ex":
+    - "Update catalog-info.yaml"
+    - "Add schema to events schemas"
+  "**/context/**":
+    - "Include comprehensive tests"
+  "**/resolvers/**":
+    - "Use GraphQL fragments for leaf components"
+  "**/scripts/**":
+    - "Include tests for complex scripts"
+    - "Use transactions appropriately"
+  "**/schemas/**":
+    - "Handle constraints in changesets"
+    - "Validate all required fields"
+    - "Consider custom validation types"
+    - "Evaluate Postgres Enum usage where appropriate"
+  "**/system_prompt/**":
+    - "Create new version when modified"
+    - "Verify all variables are provided for rendering"
+    - "Update DB table with new prompt"
+  "**/lib/**":
+    - "Use pattern matching effectively"
+    - "Break complex functions into smaller ones"
+    - "Follow Elixir naming conventions"
+    - "Simplify with/case statements using pattern matching"
+    - "Maintain immutability principles"
+    - "Use Enum and Stream appropriately"
+    - "Choose appropriate data structures"
+    - "Consider recursive function performance"
+    - "Handle long-running processes with Task/GenServer"
+    - "Use destructuring where beneficial"
+  "**/e2e/**":
+    - "New user flows must have e2e test coverage"
 
-# Paths to ignore completely
+feature_flags:
+  - "Flag names must end or begin with state (e.g. :something_enabled)"
+
 ignore:
   - ".git"
   - "node_modules"
@@ -18,6 +63,4 @@ ignore:
   - "build" 
   - "_build" 
   - "csv" 
-  - "json" 
-
-  
+  - "json"
