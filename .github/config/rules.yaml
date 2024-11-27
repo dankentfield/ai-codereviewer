@@ -4,9 +4,9 @@ global:
 extensions:
   [".ts", ".js"]:
     - "Always use export default"
-  "tsx": 
+  ".tsx": 
     - "Always use arrow functions"
-  ["exs", "ex"]: 
+  [".exs", ".ex"]: 
     - "If adding foreign keys, ensure appropriate indexes are added"
     - "Verify index type is appropriate for the use case"
     - "Consider if unique index is needed"
