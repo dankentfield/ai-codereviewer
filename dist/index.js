@@ -52,7 +52,7 @@ const minimatch_1 = __importDefault(__nccwpck_require__(2002));
 const yaml_1 = __nccwpck_require__(4083);
 const GITHUB_TOKEN = core.getInput("GITHUB_TOKEN");
 const OPENAI_API_KEY = core.getInput("OPENAI_API_KEY");
-const OPENAI_API_MODEL = core.getInput("OPENAI_API_MODEL") || "gpt-4o";
+const OPENAI_API_MODEL = core.getInput("OPENAI_API_MODEL");
 const octokit = new rest_1.Octokit({ auth: GITHUB_TOKEN });
 const openai = new openai_1.default({
     apiKey: OPENAI_API_KEY,
@@ -206,6 +206,7 @@ function createReviewComment(owner, repo, pull_number, comments) {
 function main() {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
+        console.log("Starting action");
         const prDetails = yield getPRDetails();
         let diff;
         const eventData = JSON.parse((0, fs_1.readFileSync)((_a = process.env.GITHUB_EVENT_PATH) !== null && _a !== void 0 ? _a : "", "utf8"));
@@ -238,6 +239,7 @@ function main() {
         const rulesFiles = core
             .getInput("config-file")
             .trim();
+        console.log("Rules file:", rulesFiles);
         const rules = readRules(rulesFiles);
         const { ignore: allIgnorePatterns = [] } = rules;
         const filteredDiff = parsedDiff.filter((file) => {
@@ -251,6 +253,7 @@ function main() {
 }
 function readRules(fileContents) {
     const parsed = (0, yaml_1.parse)(fileContents, { mapAsMap: true });
+    console.log("Parsed rules:", parsed);
     // Transform the parsed Map into a plain object
     const rules = {
         global: parsed.get('global') || [],

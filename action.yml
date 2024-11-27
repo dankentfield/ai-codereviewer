@@ -10,7 +10,7 @@ inputs:
   OPENAI_API_MODEL:
     description: "OpenAI API model."
     required: false
-    default: "gpt-4"
+    default: "gpt-4o"
   config-file:
     description: "YAML file with Glob patterns to set specific rules (prompts) for file extensions, directories, global rules, or exclude files from the diff analysis. Must be in the .github/config directory."
     required: true

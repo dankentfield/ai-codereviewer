@@ -6,8 +6,8 @@
   "author": "Ville Saukkonen",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
-    "package": "ncc build --source-map --license licenses.txt",
+    "build": "tsc --removeComments false",
+    "package": "ncc build --source-map",
     "format": "prettier --write .",
     "lint": "prettier --check .",
     "test": "vitest"
