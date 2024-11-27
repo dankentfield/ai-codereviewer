@@ -42,7 +42,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getApplicableRules = exports.readRules = void 0;
 const fs_1 = __nccwpck_require__(7147);
 const core = __importStar(__nccwpck_require__(2186));
 const openai_1 = __importDefault(__nccwpck_require__(47));
@@ -117,7 +116,6 @@ function getApplicableRules(rules, file) {
     const directoryRules = applicableDirectoriesKeys.flatMap((key) => directories[key]);
     return [...global, ...extensionRules, ...directoryRules];
 }
-exports.getApplicableRules = getApplicableRules;
 function createPrompt(file, chunk, prDetails, rules) {
     var _a;
     const applicableRules = getApplicableRules(rules, file);
@@ -206,7 +204,7 @@ function createReviewComment(owner, repo, pull_number, comments) {
 function main() {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        console.debug("Starting action");
+        console.log("Starting action");
         const prDetails = yield getPRDetails();
         let diff;
         const eventData = JSON.parse((0, fs_1.readFileSync)((_a = process.env.GITHUB_EVENT_PATH) !== null && _a !== void 0 ? _a : "", "utf8"));
@@ -285,8 +283,10 @@ function readRules(fileContents) {
     }
     return rules;
 }
-exports.readRules = readRules;
-exports["default"] = main;
+main().catch((error) => {
+    console.error("Error:", error);
+    process.exit(1);
+});
 
 
 /***/ }),

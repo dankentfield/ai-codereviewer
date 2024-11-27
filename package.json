@@ -8,6 +8,7 @@
   "scripts": {
     "build": "tsc --removeComments false",
     "package": "ncc build --source-map",
+    "release": "yarn build && yarn package",
     "format": "prettier --write .",
     "lint": "prettier --check .",
     "test": "vitest"

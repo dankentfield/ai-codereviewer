@@ -315,5 +315,7 @@ function readRules(fileContents: string): RulesFile {
     return rules;
 }
 
-export { readRules, getApplicableRules };
-export default main;
+main().catch((error) => {
+  console.error("Error:", error);
+  process.exit(1);
+});
