@@ -15,7 +15,7 @@ extensions:
       - "New tables must use UUID as primary key"
       - "Include timestamps (inserted_at, updated_at)"
       - "Column removals must have all usages removed in previous PR"
-      - "Always prefer pattern matching over if/else statements"
+      - "Always use pattern matching instead of if/else statements"
   - file_extensions: ["**/*.tsx"]
     rules:
       - "Always use arrow functions"
