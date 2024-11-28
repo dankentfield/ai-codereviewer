@@ -125,7 +125,7 @@ Review the following code diff in the file "${file.to
     }" and take the pull request title and description into account when writing the response.
 
 ${applicableRules.length ?? 
-(`Always check the following rules to write the review:
+(`Always leave a comment if any of the following rules are broken:
   ${applicableRules.join("\n")}
 `)}    
   

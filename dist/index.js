@@ -133,7 +133,7 @@ function createPrompt(file, chunk, prDetails, rules) {
 
 Review the following code diff in the file "${file.to}" and take the pull request title and description into account when writing the response.
 
-${(_a = applicableRules.length) !== null && _a !== void 0 ? _a : (`Always check the following rules to write the review:
+${(_a = applicableRules.length) !== null && _a !== void 0 ? _a : (`Always leave a comment if any of the following rules are broken:
   ${applicableRules.join("\n")}
 `)}    
   
