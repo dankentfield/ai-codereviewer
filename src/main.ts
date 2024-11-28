@@ -98,6 +98,7 @@ function getApplicableRules(rules: RulesFile, file: File): string[] {
     .flatMap(dir => dir.rules);
 
   const finalRules = [...global, ...extensionRules, ...directoryRules];
+  console.log("file.to", file.to)
   console.log("Final rules:", finalRules)
 
   return finalRules;

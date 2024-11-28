@@ -116,6 +116,7 @@ function getApplicableRules(rules, file) {
         .filter(dir => dir.paths.some(path => file.to ? (0, minimatch_1.default)(file.to, path) : false))
         .flatMap(dir => dir.rules);
     const finalRules = [...global, ...extensionRules, ...directoryRules];
+    console.log("file.to", file.to);
     console.log("Final rules:", finalRules);
     return finalRules;
 }
