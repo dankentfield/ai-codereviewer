@@ -59,13 +59,16 @@ global: [
 
 # Rules for specific file extensions - keys are glob patterns
 extensions:
-  [".ts", ".js"]: ["Always use export default"]
-  "tsx": ["Always use arrow functions"]
+  - file_extensions: [".ts", ".js"]
+    rules:
+      - "Always use export default"
 
 # Rules for specific directories - keys are glob patterns
 directories: 
-  "**/resolvers/**": ["Always use mocks in tests"]
-  "src/**": ["Always write tests"]
+  - paths: ["*Consumer.ex"]
+    rules:
+      - "Update catalog-info.yaml"
+      - "Add schema to events schemas"
 
 # Paths to ignore completely
 ignore:
