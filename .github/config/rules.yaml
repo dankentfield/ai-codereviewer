@@ -10,11 +10,12 @@ extensions:
       - "If adding foreign keys, ensure appropriate indexes are added"
       - "Verify index type is appropriate for the use case"
       - "Consider if unique index is needed"
-      - "Ensure table names are pluralized"
+      - "In migrations always ensure table names are pluralized"
       - "For data migrations, include testing strategy"
       - "New tables must use UUID as primary key"
       - "Include timestamps (inserted_at, updated_at)"
       - "Column removals must have all usages removed in previous PR"
+      - "Always prefer pattern matching over if/else statements"
   - file_extensions: [".tsx"]
     rules:
       - "Always use arrow functions"
