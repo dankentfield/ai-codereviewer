@@ -124,10 +124,8 @@ function createPrompt(file: File, chunk: Chunk, prDetails: PRDetails, rules: Rul
 Review the following code diff in the file "${file.to
     }" and take the pull request title and description into account when writing the response.
 
-${applicableRules.length ?? 
-(`IMPORTANT: Always leave a comment if any of the following rules are broken:
+IMPORTANT: Always leave a comment if any of the following rules are broken:
   ${applicableRules.join("\n")}
-`)}    
   
 Pull request title: ${prDetails.title}
 Pull request description:

@@ -121,7 +121,6 @@ function getApplicableRules(rules, file) {
     return finalRules;
 }
 function createPrompt(file, chunk, prDetails, rules) {
-    var _a;
     const applicableRules = getApplicableRules(rules, file);
     const prompt = `Your task is to review pull requests. Instructions:
 - Provide the response in following JSON format:  {"reviews": [{"lineNumber":  <line_number>, "reviewComment": "<review comment>"}]}
@@ -133,9 +132,8 @@ function createPrompt(file, chunk, prDetails, rules) {
 
 Review the following code diff in the file "${file.to}" and take the pull request title and description into account when writing the response.
 
-${(_a = applicableRules.length) !== null && _a !== void 0 ? _a : (`IMPORTANT: Always leave a comment if any of the following rules are broken:
+IMPORTANT: Always leave a comment if any of the following rules are broken:
   ${applicableRules.join("\n")}
-`)}    
   
 Pull request title: ${prDetails.title}
 Pull request description:
