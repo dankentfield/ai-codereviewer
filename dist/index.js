@@ -56,6 +56,7 @@ const octokit = new rest_1.Octokit({ auth: GITHUB_TOKEN });
 const openai = new openai_1.default({
     apiKey: OPENAI_API_KEY,
 });
+console.log("Running");
 function getPRDetails() {
     var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
@@ -108,12 +109,12 @@ function analyzeCode(parsedDiff, prDetails, rules) {
 }
 function getApplicableRules(rules, file) {
     const { extensions, directories, global } = rules;
-    const extensionsKeys = Object.keys(extensions);
-    const applicableExtensionKeys = extensionsKeys.filter((key) => { var _a; return (_a = file.to) === null || _a === void 0 ? void 0 : _a.endsWith(key); });
-    const extensionRules = applicableExtensionKeys.flatMap((key) => extensions[key]);
-    const directoriesKeys = Object.keys(directories);
-    const applicableDirectoriesKeys = directoriesKeys.filter((key) => file.to ? (0, minimatch_1.default)(file.to, key) : false);
-    const directoryRules = applicableDirectoriesKeys.flatMap((key) => directories[key]);
+    const extensionRules = extensions
+        .filter(ext => ext.file_extensions.some(extension => file.to ? (0, minimatch_1.default)(file.to, extension) : false))
+        .flatMap(ext => ext.rules);
+    const directoryRules = directories
+        .filter(dir => dir.paths.some(path => file.to ? (0, minimatch_1.default)(file.to, path) : false))
+        .flatMap(dir => dir.rules);
     return [...global, ...extensionRules, ...directoryRules];
 }
 function createPrompt(file, chunk, prDetails, rules) {
@@ -251,37 +252,8 @@ function main() {
     });
 }
 function readRules(fileContents) {
-    const parsed = (0, yaml_1.parse)(fileContents, { mapAsMap: true });
-    console.log("Parsed rules:", parsed);
-    // Transform the parsed Map into a plain object
-    const rules = {
-        global: parsed.get('global') || [],
-        extensions: {},
-        directories: {},
-        ignore: parsed.get('ignore') || []
-    };
-    // Handle extensions map
-    const extensionsMap = parsed.get('extensions');
-    if (extensionsMap instanceof Map) {
-        for (const [key, value] of extensionsMap.entries()) {
-            // If key is an array, create an entry for each extension
-            if (Array.isArray(key)) {
-                key.forEach(ext => {
-                    rules.extensions[ext] = value;
-                });
-            }
-            else {
-                rules.extensions[key] = value;
-            }
-        }
-    }
-    // Handle directories map
-    const directoriesMap = parsed.get('directories');
-    if (directoriesMap instanceof Map) {
-        for (const [key, value] of directoriesMap.entries()) {
-            rules.directories[key] = value;
-        }
-    }
+    const rules = (0, yaml_1.parse)(fileContents);
+    console.log("Parsed rules:", rules);
     return rules;
 }
 main().catch((error) => {
