@@ -123,7 +123,7 @@ function getApplicableRules(rules, file) {
 function createPrompt(file, chunk, prDetails, rules) {
     var _a;
     const applicableRules = getApplicableRules(rules, file);
-    return `Your task is to review pull requests. Instructions:
+    const prompt = `Your task is to review pull requests. Instructions:
 - Provide the response in following JSON format:  {"reviews": [{"lineNumber":  <line_number>, "reviewComment": "<review comment>"}]}
 - Do not give positive comments or compliments.
 - Provide comments and suggestions ONLY if there is something to improve, otherwise "reviews" should be an empty array.
@@ -133,7 +133,7 @@ function createPrompt(file, chunk, prDetails, rules) {
 
 Review the following code diff in the file "${file.to}" and take the pull request title and description into account when writing the response.
 
-${(_a = applicableRules.length) !== null && _a !== void 0 ? _a : (`Always leave a comment if any of the following rules are broken:
+${(_a = applicableRules.length) !== null && _a !== void 0 ? _a : (`IMPORTANT: Always leave a comment if any of the following rules are broken:
   ${applicableRules.join("\n")}
 `)}    
   
@@ -154,6 +154,8 @@ ${chunk.changes
         .join("\n")}
 \`\`\`
 `;
+    console.log("Prompt:", prompt);
+    return prompt;
 }
 function getAIResponse(prompt) {
     var _a, _b;

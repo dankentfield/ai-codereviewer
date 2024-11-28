@@ -113,7 +113,7 @@ interface AIReviewLine {
 function createPrompt(file: File, chunk: Chunk, prDetails: PRDetails, rules: RulesFile): string {
   const applicableRules = getApplicableRules(rules, file);
 
-  return `Your task is to review pull requests. Instructions:
+  const prompt = `Your task is to review pull requests. Instructions:
 - Provide the response in following JSON format:  {"reviews": [{"lineNumber":  <line_number>, "reviewComment": "<review comment>"}]}
 - Do not give positive comments or compliments.
 - Provide comments and suggestions ONLY if there is something to improve, otherwise "reviews" should be an empty array.
@@ -125,7 +125,7 @@ Review the following code diff in the file "${file.to
     }" and take the pull request title and description into account when writing the response.
 
 ${applicableRules.length ?? 
-(`Always leave a comment if any of the following rules are broken:
+(`IMPORTANT: Always leave a comment if any of the following rules are broken:
   ${applicableRules.join("\n")}
 `)}    
   
@@ -146,6 +146,10 @@ ${chunk.changes
       .join("\n")}
 \`\`\`
 `;
+
+console.log("Prompt:", prompt)
+
+return prompt;
 }
 
 async function getAIResponse(prompt: string): Promise<Array<AIReviewLine> | null> {
