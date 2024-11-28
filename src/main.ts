@@ -24,6 +24,8 @@ interface PRDetails {
   description: string;
 }
 
+console.log("Running")
+
 async function getPRDetails(): Promise<PRDetails> {
   const { repository, number } = JSON.parse(
     readFileSync(process.env.GITHUB_EVENT_PATH || "", "utf8")
@@ -83,15 +85,17 @@ async function analyzeCode(
 function getApplicableRules(rules: RulesFile, file: File): string[] {
   const {extensions, directories, global} = rules;
   
-  const extensionsKeys = Object.keys(extensions);
-  const applicableExtensionKeys = extensionsKeys.filter((key: string) => file.to?.endsWith(key));
-  const extensionRules = applicableExtensionKeys.flatMap((key: string) => extensions[key]);
+  const extensionRules = extensions
+    .filter(ext => ext.file_extensions.some(extension => 
+      file.to ? minimatch(file.to, extension) : false
+    ))
+    .flatMap(ext => ext.rules);
 
-  const directoriesKeys = Object.keys(directories);
-  const applicableDirectoriesKeys = directoriesKeys.filter((key: string) => 
-    file.to ? minimatch(file.to, key) : false
-  );
-  const directoryRules = applicableDirectoriesKeys.flatMap((key: string) => directories[key]);
+  const directoryRules = directories
+    .filter(dir => dir.paths.some(path => 
+      file.to ? minimatch(file.to, path) : false
+    ))
+    .flatMap(dir => dir.rules);
 
   return [...global, ...extensionRules, ...directoryRules];
 }
@@ -271,48 +275,21 @@ async function main() {
 }
 
 interface RulesFile {
-  directories: Record<string, string[]>;
-  extensions: Record<string, string[]>;
-  global: Array<string>;
-  ignore: Array<string>;
+  directories: Array<{
+    paths: string[];
+    rules: string[];
+  }>;
+  extensions: Array<{
+    file_extensions: string[];
+    rules: string[];
+  }>;
+  global: string[];
+  ignore: string[];
 }
 
 function readRules(fileContents: string): RulesFile {
-    const parsed = parse(fileContents, { mapAsMap: true });
-
-    console.log("Parsed rules:", parsed)
-    
-    // Transform the parsed Map into a plain object
-    const rules: RulesFile = {
-        global: parsed.get('global') || [],
-        extensions: {},
-        directories: {},
-        ignore: parsed.get('ignore') || []
-    };
-
-    // Handle extensions map
-    const extensionsMap = parsed.get('extensions');
-    if (extensionsMap instanceof Map) {
-        for (const [key, value] of extensionsMap.entries()) {
-            // If key is an array, create an entry for each extension
-            if (Array.isArray(key)) {
-                key.forEach(ext => {
-                    rules.extensions[ext] = value;
-                });
-            } else {
-                rules.extensions[key] = value;
-            }
-        }
-    }
-
-    // Handle directories map
-    const directoriesMap = parsed.get('directories');
-    if (directoriesMap instanceof Map) {
-        for (const [key, value] of directoriesMap.entries()) {
-            rules.directories[key] = value;
-        }
-    }
-
+    const rules = parse(fileContents);
+    console.log("Parsed rules:", rules)
     return rules;
 }
 
