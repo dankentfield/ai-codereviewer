@@ -2,10 +2,10 @@ global:
   - "No console.logs allowed."
 
 extensions:
-  - file_extensions: [".ts", ".js"]
+  - file_extensions: ["**/*.ts", "**/*.js"]
     rules:
       - "Always use export default"
-  - file_extensions: [".exs", ".ex"]
+  - file_extensions: ["**/*.exs", "**/*.ex"]
     rules:
       - "If adding foreign keys, ensure appropriate indexes are added"
       - "Verify index type is appropriate for the use case"
@@ -16,16 +16,16 @@ extensions:
       - "Include timestamps (inserted_at, updated_at)"
       - "Column removals must have all usages removed in previous PR"
       - "Always prefer pattern matching over if/else statements"
-  - file_extensions: [".tsx"]
+  - file_extensions: ["**/*.tsx"]
     rules:
       - "Always use arrow functions"
 
 directories: 
-  - paths: ["*Consumer.ex"]
+  - paths: ["**/*Consumer.ex"]
     rules:
       - "Update catalog-info.yaml"
       - "Add schema to events schemas"
-  - paths: ["*Publisher.ex"]
+  - paths: ["**/*Publisher.ex"]
     rules:
       - "Update catalog-info.yaml"
       - "Add schema to events schemas"
