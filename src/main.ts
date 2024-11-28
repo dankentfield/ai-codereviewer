@@ -97,7 +97,10 @@ function getApplicableRules(rules: RulesFile, file: File): string[] {
     ))
     .flatMap(dir => dir.rules);
 
-  return [...global, ...extensionRules, ...directoryRules];
+  const finalRules = [...global, ...extensionRules, ...directoryRules];
+  console.log("Final rules:", finalRules)
+
+  return finalRules;
 }
 
 interface AIReviewLine {

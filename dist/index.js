@@ -115,7 +115,9 @@ function getApplicableRules(rules, file) {
     const directoryRules = directories
         .filter(dir => dir.paths.some(path => file.to ? (0, minimatch_1.default)(file.to, path) : false))
         .flatMap(dir => dir.rules);
-    return [...global, ...extensionRules, ...directoryRules];
+    const finalRules = [...global, ...extensionRules, ...directoryRules];
+    console.log("Final rules:", finalRules);
+    return finalRules;
 }
 function createPrompt(file, chunk, prDetails, rules) {
     var _a;
