@@ -15582,7 +15582,6 @@ function getPRDetails() {
             repo: repository.name,
             pull_number: number,
         });
-        console.log(prResponse);
         return {
             owner: repository.owner.login,
             repo: repository.name,
@@ -15702,6 +15701,7 @@ function analyzeCode(parsedDiff, prDetails, rules) {
             for (const chunk of file.chunks) {
                 const prompt = (0, prompt_1.default)(file, chunk, prDetails, rules);
                 const aiResponse = yield (0, openai_1.getAIResponse)(prompt);
+                console.log(`Got AI response: ${aiResponse}`);
                 if (aiResponse) {
                     const newComments = (0, github_1.createComments)(file, chunk, aiResponse);
                     if (newComments) {
@@ -15743,6 +15743,7 @@ function main() {
             return !allIgnorePatterns.some((pattern) => { var _a; return (0, minimatch_1.default)((_a = file.to) !== null && _a !== void 0 ? _a : "", pattern); });
         });
         const comments = yield analyzeCode(filteredDiff, prDetails, rules);
+        console.log(`Created ${comments.length} comments`);
         if (comments.length > 0) {
             yield (0, github_1.createReviewComment)(prDetails.owner, prDetails.repo, prDetails.pull_number, comments);
         }

@@ -25,7 +25,6 @@ async function getPRDetails(): Promise<PRDetails> {
     repo: repository.name,
     pull_number: number,
   });
-  console.log(prResponse);
   return {
     owner: repository.owner.login,
     repo: repository.name,

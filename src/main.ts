@@ -25,6 +25,7 @@ async function analyzeCode(
     for (const chunk of file.chunks) {
       const prompt = createPrompt(file, chunk, prDetails, rules);
       const aiResponse = await getAIResponse(prompt);
+      console.log(`Got AI response: ${aiResponse}`);
       if (aiResponse) {
         const newComments = createComments(file, chunk, aiResponse);
         if (newComments) {
@@ -76,6 +77,8 @@ async function main() {
   });
 
   const comments = await analyzeCode(filteredDiff, prDetails, rules);
+
+  console.log(`Created ${comments.length} comments`);
 
   if (comments.length > 0) {
     await createReviewComment(
