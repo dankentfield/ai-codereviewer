@@ -98,7 +98,7 @@ Contributions are welcome!
 
 We use semver.
 
-Github actions don't support pinning to the latest major version, so make sure you only increment the major version if you make backwards incompatible changes. Please contact teams that consume this action and let them know they may need to update their rules.yaml file and github actions workflow file.
+Github actions don't support pinning to the latest major version, so make sure you only increment the major version if you make backwards incompatible changes. If you do update the major version please contact teams that consume this action and let them know they may need to update their rules.yaml file and github actions workflow file.
 
 ## Future releases
 
