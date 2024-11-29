@@ -2,29 +2,30 @@ global:
   - "No console.logs allowed."
 
 extensions:
-  - file_extensions: [".ts", ".js"]
+  - file_extensions: ["**/*.ts", "**/*.js"]
     rules:
       - "Always use export default"
-  - file_extensions: [".exs", ".ex"]
+  - file_extensions: ["**/*.exs", "**/*.ex"]
     rules:
       - "If adding foreign keys, ensure appropriate indexes are added"
       - "Verify index type is appropriate for the use case"
       - "Consider if unique index is needed"
-      - "Ensure table names are pluralized"
+      - "In migrations always ensure table names are pluralized"
       - "For data migrations, include testing strategy"
       - "New tables must use UUID as primary key"
       - "Include timestamps (inserted_at, updated_at)"
       - "Column removals must have all usages removed in previous PR"
-  - file_extensions: [".tsx"]
+      - "Always use pattern matching instead of if/else statements"
+  - file_extensions: ["**/*.tsx"]
     rules:
       - "Always use arrow functions"
 
 directories: 
-  - paths: ["*Consumer.ex"]
+  - paths: ["**/*Consumer.ex"]
     rules:
       - "Update catalog-info.yaml"
       - "Add schema to events schemas"
-  - paths: ["*Publisher.ex"]
+  - paths: ["**/*Publisher.ex"]
     rules:
       - "Update catalog-info.yaml"
       - "Add schema to events schemas"
