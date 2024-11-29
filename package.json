@@ -1,14 +1,10 @@
 {
-  "name": "open-ai-reviewer",
+  "name": "code_nerd",
   "version": "1.0.0",
   "description": "Open AI powered code reviews",
-  "main": "lib/main.js",
-  "author": "Ville Saukkonen",
-  "license": "MIT",
+  "main": "src/index.ts",
   "scripts": {
-    "build": "tsc --removeComments false",
-    "package": "ncc build --source-map",
-    "release": "yarn build && yarn package",
+    "build": "ncc build --source-map",
     "format": "prettier --write .",
     "lint": "prettier --check .",
     "test": "vitest"

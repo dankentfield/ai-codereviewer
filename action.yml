@@ -11,12 +11,8 @@ inputs:
     description: "OpenAI API model."
     required: false
     default: "gpt-4o"
-  config-file:
-    description: "YAML file with Glob patterns to set specific rules (prompts) for file extensions, directories, global rules, or exclude files from the diff analysis. Must be in the .github/config directory."
-    required: true
-    default: ""
 runs:
-  using: "node16"
+  using: "node22"
   main: "dist/index.js"
 branding:
   icon: "aperture"

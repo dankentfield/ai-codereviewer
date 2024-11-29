@@ -1,4 +1,4 @@
-global: 
+global:
   - "No console.logs allowed."
 
 extensions:
@@ -20,7 +20,7 @@ extensions:
     rules:
       - "Always use arrow functions"
 
-directories: 
+directories:
   - paths: ["**/*Consumer.ex"]
     rules:
       - "Update catalog-info.yaml"
@@ -70,7 +70,7 @@ ignore:
   - ".git"
   - "node_modules"
   - "dist"
-  - "build" 
-  - "_build" 
-  - "csv" 
+  - "build"
+  - "_build"
+  - "csv"
   - "json"
