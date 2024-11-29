@@ -101,3 +101,8 @@ Let the maintainer generate the final package (`yarn build` & `yarn package`).
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
+
+## Future releases 
+
+* Function call for other files to check tests exist
+* Allow replies to comments on the PR
